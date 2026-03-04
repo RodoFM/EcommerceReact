@@ -1,16 +1,26 @@
+import { useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { CartContext } from "../context/CartContext";
+
 export default function CartWidget() {
+  const { totalQuantity } = useContext(CartContext);
+  const navigate = useNavigate();
+
   return (
     <button
       type="button"
       className="btn btn-outline-light position-relative"
       aria-label="Carrito de compras"
+      onClick={() => navigate("/cart")}
     >
-      {/* Con Bootstrap Icons */}
       <i className="bi bi-bag-heart-fill me-2" aria-hidden="true"></i>
-        Carrito
-      <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-        0
-      </span>
+      Carrito
+
+      {totalQuantity > 0 && (
+        <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+          {totalQuantity}
+        </span>
+      )}
     </button>
   );
 }
