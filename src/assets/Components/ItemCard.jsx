@@ -1,27 +1,47 @@
 import { Link } from "react-router-dom";
 
 export default function ItemCard({ producto }) {
-    if (!producto) return null;
+  if (!producto) return null;
 
-    return (
-        <div className="col-12 col-md-6 col-lg-4">
-            <div className="card h-100 shadow-sm">
-                <div className="card-body">
-                    <h5 className="card-little text-success fw-bold">{producto.nombre}</h5>
-                    <p className="card-text mb-1">
-                        <span className="fw-semibold">Categoría: </span> {producto.categoroa}</p>
-                    <p className="card-text mb-1">
-                        <span className="fw-semibold">Precio: </span> {" "}${Number(producto.precio).toLocaleString("es-CL")}
-                    </p>
-                </div>
+  const tipoLabel = producto.tipo ?? producto.categoria ?? "Sin tipo";
 
-                <div className="card-footer bg-transparent border-0 p-3 pt-0">
-                    <Link className="btn btn-success w-100" to={`/item/${producto.id}`}>Ver detalle</Link>
-                </div>
-            </div >
-        </div>
+  return (
+    <div className="card h-100">
+      {producto.imagenUrl ? (
+        <img
+          src={producto.imagenUrl}
+          alt={producto.nombre}
+          className="product-img"
+          loading="lazy"
+        />
+      ) : (
+        <div className="product-img-placeholder">🧶 Sin imagen</div>
+      )}
 
+      <div className="card-body">
+        <h5 className="card-title text-center">{producto.nombre}</h5>
 
+        <p className="card-text mb-1">
+          <strong>Tipo:</strong> {tipoLabel}
+        </p>
 
-    );
+        <p className="card-text mb-2">
+          <strong>Precio:</strong>{" "}
+          {Number(producto.precio).toLocaleString("es-CL")}
+        </p>
+
+        {producto.descripcion && (
+          <p className="card-text text-muted">
+            {producto.descripcion.length > 90
+              ? producto.descripcion.slice(0, 90) + "..."
+              : producto.descripcion}
+          </p>
+        )}
+
+        <Link className="btn btn-primary w-100 mt-2" to={`/item/${producto.id}`}>
+          Ver detalle
+        </Link>
+      </div>
+    </div>
+  );
 }

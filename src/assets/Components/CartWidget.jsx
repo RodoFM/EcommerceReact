@@ -7,15 +7,8 @@ export default function CartWidget() {
   const navigate = useNavigate();
 
   return (
-    <button
-      type="button"
-      className="btn btn-outline-light position-relative"
-      aria-label="Carrito de compras"
-      onClick={() => navigate("/cart")}
-    >
-      <i className="bi bi-bag-heart-fill me-2" aria-hidden="true"></i>
-      Carrito
-
+    <button type="button" className="btn btn-outline-light position-relative" onClick={() => navigate("/cart")}>
+      🧶
       {totalQuantity > 0 && (
         <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
           {totalQuantity}
@@ -24,3 +17,4 @@ export default function CartWidget() {
     </button>
   );
 }
+

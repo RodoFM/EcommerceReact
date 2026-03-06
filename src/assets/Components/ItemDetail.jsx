@@ -1,81 +1,79 @@
-import { useState, useContext } from "react";
+import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import ItemCount from "./ItemCount";
-import { CartContext } from "../context/CartContext.jsx"; 
+import { CartContext } from "../context/CartContext.jsx";
 
 export default function ItemDetail({ item }) {
   const [cantidadAgregada, setCantidadAgregada] = useState(0);
   const { addItem } = useContext(CartContext);
 
- const onAdd = (cantidad) => {
-  const agregado = addItem(
-  {
-    id: item.id, 
-    nombre: item.nombre,
-    precio: item.precio,
-    stock: item.stock,
-    categoria: item.categoria,
-  },
-  cantidad
-);
+  const tipoLabel = item.tipo ?? item.categoria ?? "Sin tipo";
 
-  if (agregado) {
-    setCantidadAgregada(cantidad);
-  } else {
-    alert("No puedes agregar más productos que el stock disponible.");
-  }
-};
+  const onAdd = (cantidad) => {
+    const ok = addItem(
+      {
+        id: item.id,
+        nombre: item.nombre,
+        precio: item.precio,
+        stock: item.stock,
+        tipo: item.tipo ?? item.categoria ?? null,
+        descripcion: item.descripcion ?? "",
+        imagenUrl: item.imagenUrl ?? "",
+      },
+      cantidad
+    );
 
+    if (ok) setCantidadAgregada(cantidad);
+    else alert("No puedes agregar más que el stock disponible.");
+  };
 
   return (
-    <main className="container my-4">
-      <div className="card shadow-sm">
-        <div className="card-body">
-          <h2 className="text-success fw-bold">{item.nombre}</h2>
+    <div className="card">
+      {item.imagenUrl ? (
+        <img src={item.imagenUrl} alt={item.nombre} className="product-img-detail" />
+      ) : (
+        <div className="product-img-placeholder">🧶 Sin imagen</div>
+      )}
 
-          <p className="mb-1">
-            <span className="fw-semibold">Categoría:</span> {item.categoria}
-          </p>
-          <p className="mb-1">
-            <span className="fw-semibold">Precio: </span> {item.precio.toLocaleString("es-CL")}
-          </p>
-          <p className="mb-1">
-            <span className="fw-semibold">Stock: </span> {item.stock}
-          </p>
+      <div className="card-body">
+        <h3 className="card-title product-detail-title">{item.nombre}</h3>
 
-          <hr />
+        <div className="product-meta mb-3">
+          <span className="meta-pill">Tipo: {tipoLabel}</span>
+          <span className="meta-pill">Stock: {item.stock}</span>
+          <span className="meta-pill">
+            {Number(item.precio).toLocaleString("es-CL")}
+          </span>
+        </div>
 
-          <p className="text-secondary">{item.descripcion}</p>
+        {item.descripcion && <p className="text-muted">{item.descripcion}</p>}
 
-          <div className="mt-4">
-            {cantidadAgregada === 0 ? (
-              <ItemCount stock={item.stock} initial={1} onAdd={onAdd} />
-            ) : (
-              <>
-                <div className="alert alert-success">
-                  Agregaste {cantidadAgregada} producto/s al carrito
-                </div>
+        {item.stock === 0 && (
+          <div className="alert alert-warning">Producto sin stock</div>
+        )}
 
-                
-                <div className="d-flex gap-2">
-                  <Link to="/cart" className="btn btn-outline-success">
-                    Ir al carrito
-                  </Link>
-                  <Link to="/" className="btn btn-success">
-                    Seguir comprando
-                  </Link>
-                </div>
-              </>
-            )}
+        {cantidadAgregada === 0 ? (
+          <ItemCount stock={item.stock} initial={1} onAdd={onAdd} />
+        ) : (
+          <div className="alert alert-success">
+            Agregaste {cantidadAgregada} producto/s al carrito.
+            <div className="mt-3 d-flex gap-2">
+              <Link className="btn btn-success" to="/cart">
+                Ir al carrito
+              </Link>
+              <Link className="btn btn-outline-primary" to="/">
+                Seguir comprando
+              </Link>
+            </div>
           </div>
+        )}
 
-          <div className="mt-3">
-            <Link to="/" className="btn btn-success">
-              Volver al catálogo
-            </Link>
-          </div>
+        <div className="mt-3">
+          <Link to="/" className="btn btn-link">
+            Volver al catálogo
+          </Link>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

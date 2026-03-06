@@ -28,52 +28,49 @@ export function CartProvider({ children }) {
     [cart]
   );
 
-const addItem = (product, quantity) => {
-  let success = true;
+  const addItem = (product, quantity) => {
+    let success = true;
 
-  setCart((prev) => {
-    const existing = prev.find((p) => p.id === product.id);
-    const currentQty = existing?.quantity ?? 0;
-    const newQty = currentQty + quantity;
+    setCart((prev) => {
+      const existing = prev.find((p) => p.id === product.id);
+      const currentQty = existing?.quantity ?? 0;
+      const newQty = currentQty + quantity;
 
-    if (newQty > product.stock) {
-      success = false;
-      return prev;
-    }
+      if (newQty > product.stock) {
+        success = false;
+        return prev;
+      }
 
-    if (existing) {
-      return prev.map((p) =>
-        p.id === product.id ? { ...p, quantity: newQty } : p
-      );
-    }
+      if (existing) {
+        return prev.map((p) => (p.id === product.id ? { ...p, quantity: newQty } : p));
+      }
 
-    return [...prev, { ...product, quantity }];
-  });
+      return [...prev, { ...product, quantity }];
+    });
 
-  return success;
-};
-
+    return success;
+  };
 
   const removeItem = (id) => setCart((prev) => prev.filter((p) => p.id !== id));
   const clearCart = () => setCart([]);
+
   const updateItemQty = (id, quantity) => {
     if (quantity <= 0) return removeItem(id);
     setCart((prev) => prev.map((p) => (p.id === id ? { ...p, quantity } : p)));
   };
 
-  return (
-    <CartContext.Provider
-      value={{
-        cart,
-        addItem,
-        removeItem,
-        clearCart,
-        updateItemQty,
-        totalQuantity,
-        totalPrice,
-      }}
-    >
-      {children}
-    </CartContext.Provider>
+  const value = useMemo(
+    () => ({
+      cart,
+      totalQuantity,
+      totalPrice,
+      addItem,
+      removeItem,
+      clearCart,
+      updateItemQty,
+    }),
+    [cart, totalQuantity, totalPrice]
   );
+
+  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

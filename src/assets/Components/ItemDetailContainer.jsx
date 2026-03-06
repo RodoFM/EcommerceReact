@@ -1,37 +1,49 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { getProductById } from "../../services/productsService"; 
 import ItemDetail from "./ItemDetail";
+import { getProductById } from "../../services/productsService";
 
 export default function ItemDetailContainer() {
   const { itemId } = useParams();
+
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [err, setErr] = useState("");
 
   useEffect(() => {
+    let active = true;
+
     setLoading(true);
+    setErr("");
 
     getProductById(itemId)
-      .then((data) => setItem(data))
-      .finally(() => setLoading(false));
+      .then((data) => {
+        if (active) setItem(data);
+      })
+      .catch((e) => {
+        if (active) setErr(e?.message || "Error cargando detalle");
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
   }, [itemId]);
 
-  if (loading) {
-    return (
-      <main className="container my-4">
-        <div className="alert alert-success">Cargando detalle...</div>
-      </main>
-    );
-  }
+  if (loading) return <div className="alert alert-info">Cargando detalle...</div>;
+
+  if (err) return <div className="alert alert-danger">{err}</div>;
 
   if (!item) {
     return (
-      <main className="container my-4">
-        <div className="alert alert-danger">Producto no encontrado</div>
-        <Link className="btn btn-success" to="/">
-          Volver al catálogo
+      <div className="alert alert-warning">
+        Producto no encontrado.{" "}
+        <Link to="/" className="alert-link">
+          Volver
         </Link>
-      </main>
+      </div>
     );
   }
 
